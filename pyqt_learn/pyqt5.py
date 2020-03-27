@@ -28,32 +28,20 @@ class App(QWidget):
         self.coment= str(coment)
         print("result:"+self.coment)
     
-    def changeColor3dmouse(self,bt_num):
-        print("mode:"+str(bt_num))
+    def changeColor3dmouse(self,mode):
+        print("mode:"+str(mode))
 
-#        if bt_num==1:
-#            if self.button_data==2:
-#                self.button_data=0
-#            else:
-#                self.button_data+=1
-#
-#        elif bt_num==2:
-#            if self.button_data==0:
-#                self.button_data=2
-#            else:
-#                self.button_data-=1
-#
-        if bt_num==0:
+        if mode==0:
             self.btn1.setStyleSheet('QPushButton {background-color: #00ff00}')
             self.btn2.setStyleSheet('QPushButton {background-color: #AAAAAA}')
             self.btn3.setStyleSheet('QPushButton {background-color: #AAAAAA}')
 
-        elif bt_num==1:
+        elif mode==1:
             self.btn1.setStyleSheet('QPushButton {background-color: #AAAAAA}')
             self.btn2.setStyleSheet('QPushButton {background-color: #00ff00}')
             self.btn3.setStyleSheet('QPushButton {background-color: #AAAAAA}')
  
-        elif bt_num==2:
+        elif mode==2:
             self.btn1.setStyleSheet('QPushButton {background-color: #AAAAAA}')
             self.btn2.setStyleSheet('QPushButton {background-color: #AAAAAA}')
             self.btn3.setStyleSheet('QPushButton {background-color: #00ff00}')
@@ -82,18 +70,6 @@ class App(QWidget):
             self.btn1.setStyleSheet('QPushButton {background-color: #AAAAAA}')
             self.btn2.setStyleSheet('QPushButton {background-color: #AAAAAA}')
             self.btn3.setStyleSheet('QPushButton {background-color: #00ff00}')
-  
-    ''' 
-    def button(self,title,number):
-        self.btn = QPushButton(title, self)
-        self.btn.setCheckable(True)
-        self.btn.setToolTip("This is an example button")
-        self.btn.resize(120,240)
-        self.btn.move(130*number,70)
-        self.btn.setStyleSheet('QPushButton {background-color: #ff0000}')
-        self.btn.clicked.connect(self.on_click)
-        self.btn.clicked.connect(self.changeColor)
-    '''    
 
     def initUI(self):
         self.setWindowTitle(self.title)
@@ -160,24 +136,6 @@ def subscribe_handler(handle):
     while True:
         handle()
 
-#msg = example_t()
-#msg.mode = 0
-#msg.position = (1, 2, 3)
-#msg.orientation = (1, 0, 0, 0)
-#msg.ranges = range(15)
-#msg.num_ranges = len(msg.ranges)
-#msg.name = "example string"
-#msg.enabled = True
-
-#lc = lcm.LCM()
-#signal = pyqtSignal(int)
-#signal.connect
-#lcm_handler =  LcmHandler(signal)
-#subscription = lc.subscribe("EXAMPLE", lcm_handler.my_handler)
-### kakikae
-#thread1 = threading.Thread(target=subscribe_handler, args=(lc.handle,))
-#thread1.start()
-######
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
