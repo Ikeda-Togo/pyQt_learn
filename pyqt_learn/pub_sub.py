@@ -40,6 +40,6 @@ try:
         #print("hi")
         msg.mode =int(input("number only type:"))
         lc.publish("EXAMPLE", msg.encode())
-        #time.sleep(2)
+        time.sleep(0.5)
 except KeyboardInterrupt:
     pass

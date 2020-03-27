@@ -5,6 +5,12 @@ import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
+from PyQt5.QtCore import QObject, pyqtSignal, QThread
+
+import threading
+import lcm
+from exlcm import example_t
+
 
 class App(QWidget):
 
@@ -15,22 +21,64 @@ class App(QWidget):
         self.top = 10
         self.width = 640
         self.height = 480
+        self.lc=lcm.LCM()
         self.initUI()
+        
+    def comentout(self,coment):
+        self.coment= str(coment)
+        print("result:"+self.coment)
+    
+    def changeColor3dmouse(self,bt_num):
+        print("mode:"+str(bt_num))
+
+#        if bt_num==1:
+#            if self.button_data==2:
+#                self.button_data=0
+#            else:
+#                self.button_data+=1
+#
+#        elif bt_num==2:
+#            if self.button_data==0:
+#                self.button_data=2
+#            else:
+#                self.button_data-=1
+#
+        if bt_num==0:
+            self.btn1.setStyleSheet('QPushButton {background-color: #00ff00}')
+            self.btn2.setStyleSheet('QPushButton {background-color: #AAAAAA}')
+            self.btn3.setStyleSheet('QPushButton {background-color: #AAAAAA}')
+
+        elif bt_num==1:
+            self.btn1.setStyleSheet('QPushButton {background-color: #AAAAAA}')
+            self.btn2.setStyleSheet('QPushButton {background-color: #00ff00}')
+            self.btn3.setStyleSheet('QPushButton {background-color: #AAAAAA}')
+ 
+        elif bt_num==2:
+            self.btn1.setStyleSheet('QPushButton {background-color: #AAAAAA}')
+            self.btn2.setStyleSheet('QPushButton {background-color: #AAAAAA}')
+            self.btn3.setStyleSheet('QPushButton {background-color: #00ff00}')
 
     def changeColor(self):
         source=self.sender()
+        msg=example_t()
 
         if source.text()=="button1":
+            msg.mode = 0
+            self.lc.publish("EXAMPLE",msg.encode())
             self.btn1.setStyleSheet('QPushButton {background-color: #00ff00}')
             self.btn2.setStyleSheet('QPushButton {background-color: #AAAAAA}')
             self.btn3.setStyleSheet('QPushButton {background-color: #AAAAAA}')
 
         elif source.text()=="button2": 
+            msg.mode = 1
+            self.lc.publish("EXAMPLE",msg.encode())
             self.btn1.setStyleSheet('QPushButton {background-color: #AAAAAA}')
             self.btn2.setStyleSheet('QPushButton {background-color: #00ff00}')
             self.btn3.setStyleSheet('QPushButton {background-color: #AAAAAA}')
  
         elif source.text()=="button3": 
+            msg.mode = 2
+            self.lc.publish("EXAMPLE",msg.encode())
             self.btn1.setStyleSheet('QPushButton {background-color: #AAAAAA}')
             self.btn2.setStyleSheet('QPushButton {background-color: #AAAAAA}')
             self.btn3.setStyleSheet('QPushButton {background-color: #00ff00}')
@@ -79,39 +127,57 @@ class App(QWidget):
         self.btn3.clicked.connect(self.on_click)
         self.btn3.clicked.connect(self.changeColor)
 
-        self.yeah = QPushButton('yeah', self)
-        self.yeah.setCheckable(True)
-        self.yeah.setToolTip("This is an example button")
-        self.yeah.resize(120,60)
-        self.yeah.move(260,350)
-        self.yeah.setStyleSheet('QPushButton {background-color: #AAAAAA}')
-        self.yeah.clicked.connect(self.makeWindow)
         self.show()
-   
 
-    def makeWindow(self):
-        # サブウィンドウの作成
-        subWindow = SubWindow()
-        # サブウィンドウの表示
-        subWindow.show()
+        #self.lc = lcm.LCM()
+        lcm_handler =  LcmHandler()
+        lcm_handler._signal.connect(self.changeColor3dmouse)
+        subscription = self.lc.subscribe("EXAMPLE", lcm_handler.my_handler)
+        ## kakikae
+        thread1 = threading.Thread(target=subscribe_handler, args=(self.lc.handle,))
+        thread1.start()
+
+
 
     @pyqtSlot()
     def on_click(self):
         print("PyQt5 button click")
 
-class SubWindow(QWidget):
-    def __init__(self, parent=None):
-        # こいつがサブウィンドウの実体？的な。ダイアログ
-        self.w = QDialog(parent)
-        label = QLabel()
-        label.setText('Sub Window')
-        layout = QHBoxLayout()
-        layout.addWidget(label)
-        self.w.setLayout(layout)
 
-    def show(self):
-        self.w.exec_()
+class LcmHandler(QObject):
+    _signal = pyqtSignal(int)
 
+    def my_handler(self,channel, data):
+        msg = example_t.decode(data)
+
+        print("Received message on channel \"%s\"" % str(channel))
+        print("   mode   = %s" % str(msg.mode))
+        self._signal.emit(int(msg.mode))
+        #print(msg.name)
+        #print("")
+
+def subscribe_handler(handle):
+    while True:
+        handle()
+
+#msg = example_t()
+#msg.mode = 0
+#msg.position = (1, 2, 3)
+#msg.orientation = (1, 0, 0, 0)
+#msg.ranges = range(15)
+#msg.num_ranges = len(msg.ranges)
+#msg.name = "example string"
+#msg.enabled = True
+
+#lc = lcm.LCM()
+#signal = pyqtSignal(int)
+#signal.connect
+#lcm_handler =  LcmHandler(signal)
+#subscription = lc.subscribe("EXAMPLE", lcm_handler.my_handler)
+### kakikae
+#thread1 = threading.Thread(target=subscribe_handler, args=(lc.handle,))
+#thread1.start()
+######
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
